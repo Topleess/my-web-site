@@ -1,0 +1,41 @@
+# Node modules
+node_modules
+npm-debug.log
+
+# Vite build
+dist
+.vite
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backend stuff
+backend/
+**/__pycache__
+**/*.pyc
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!README.md
+
+# Terminals
+terminals/

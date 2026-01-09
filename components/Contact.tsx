@@ -7,7 +7,7 @@ const Contact: React.FC = () => {
       <div className="w-full mx-auto max-w-screen-2xl flex flex-col relative">
         
         {/* Sticky Label (Text Only) - Left Aligned */}
-        <div className="sticky top-28 z-20 mb-8 self-start mix-blend-difference pointer-events-none">
+        <div className="sticky top-20 z-20 mb-8 self-start mix-blend-difference pointer-events-none">
            <span className="text-[#FF4533] font-bold text-sm tracking-widest uppercase inline-block">
             // Связаться
           </span>

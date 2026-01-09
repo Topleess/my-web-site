@@ -2,6 +2,14 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 
 const Intro: React.FC = () => {
+  const handleScrollToProjects = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const element = document.getElementById('projects');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section id="about" className="w-full bg-[#050505] text-white py-24 px-4 md:px-10 flex flex-col justify-center min-h-[80vh]">
       
@@ -9,7 +17,7 @@ const Intro: React.FC = () => {
       <div className="w-full mx-auto flex flex-col h-full relative">
         
         {/* Sticky Label */}
-        <div className="sticky top-28 z-20 mb-12 mix-blend-difference pointer-events-none">
+        <div className="sticky top-20 z-20 mb-12 mix-blend-difference pointer-events-none">
           <span className="text-[#FF4533] font-bold text-sm tracking-widest uppercase inline-block">
             // Обо мне
           </span>
@@ -38,7 +46,8 @@ const Intro: React.FC = () => {
 
             {/* Redesigned Button matching Contact style */}
             <a 
-              href="#projects" 
+              href="#projects"
+              onClick={handleScrollToProjects}
               className="group relative inline-flex items-center justify-center gap-4 px-8 py-4 bg-[#FF4533] text-white rounded-full overflow-hidden transition-transform duration-300 hover:scale-105 active:scale-95"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>

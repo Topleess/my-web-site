@@ -1,20 +1,43 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Contact from '../components/Contact';
-import { projectsData } from '../data/projects';
+import { useProject } from '../hooks/useProject';
 
 const ProjectPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const project = projectsData.find(p => p.id === Number(id));
+  const { project, loading, error } = useProject(id ? Number(id) : undefined);
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <Loader2 className="w-16 h-16 animate-spin text-[#FF4533]" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">⚠️ Ошибка</h1>
+          <p className="text-gray-400 mb-6">{error}</p>
+          <Link to="/" className="text-[#FF4533] underline hover:text-white">Вернуться на главную</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Not found state
   if (!project) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">

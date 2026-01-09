@@ -1,20 +1,42 @@
-import React, { useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowUpRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { projectsData, Category } from '../data/projects';
+import { Category } from '../data/projects';
+import { useProjects } from '../hooks/useProjects';
+import { apiClient } from '../api/client';
 
 const categories: Category[] = ['Все', 'Дизайн', 'Разработка', 'Стартапы', 'Другое'];
 
 const Projects: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('Все');
+  const { projects: filteredProjects, loading, error } = useProjects({ 
+    category: activeCategory 
+  });
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
-  const filteredProjects = activeCategory === 'Все'
-    ? projectsData
-    : projectsData.filter(project => project.category === activeCategory);
+  // Загрузка подсчета категорий при монтировании компонента
+  useEffect(() => {
+    const fetchCategoryCounts = async () => {
+      const response = await apiClient.getCategories();
+      if (response.data) {
+        const counts: Record<string, number> = {};
+        let totalCount = 0;
+        
+        response.data.categories.forEach(cat => {
+          counts[cat.name] = cat.count;
+          totalCount += cat.count;
+        });
+        
+        counts['Все'] = totalCount;
+        setCategoryCounts(counts);
+      }
+    };
+    
+    fetchCategoryCounts();
+  }, []);
 
   const getCount = (cat: Category) => {
-    if (cat === 'Все') return projectsData.length;
-    return projectsData.filter(p => p.category === cat).length;
+    return categoryCounts[cat] || 0;
   };
 
   return (
@@ -22,7 +44,7 @@ const Projects: React.FC = () => {
       <div className="w-full mx-auto max-w-screen-2xl relative">
         
         {/* Sticky Section Label */}
-        <div className="sticky top-[72px] z-30 mb-12 mix-blend-difference pointer-events-none self-start">
+        <div className="sticky top-20 z-30 mb-12 mix-blend-difference pointer-events-none self-start">
              <span className="text-[#FF4533] font-bold text-sm tracking-widest uppercase inline-block">
               // Проекты
             </span>
@@ -65,9 +87,25 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-12 h-12 animate-spin text-[#FF4533]" />
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="w-full py-20 text-center">
+            <p className="text-red-500 text-lg mb-4">⚠️ Ошибка загрузки проектов</p>
+            <p className="text-gray-500 text-sm">{error}</p>
+          </div>
+        )}
+
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-          {filteredProjects.map((project) => (
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+            {filteredProjects.map((project) => (
             <Link 
               to={`/project/${project.id}`}
               key={project.id} 
@@ -112,10 +150,11 @@ const Projects: React.FC = () => {
 
               </div>
             </Link>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
         
-        {filteredProjects.length === 0 && (
+        {!loading && !error && filteredProjects.length === 0 && (
           <div className="w-full py-20 text-center text-gray-500 uppercase tracking-widest">
             Нет проектов в этой категории
           </div>
