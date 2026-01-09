@@ -1,0 +1,34 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            # Заходим в папку
+            cd ~/portfolio
+            
+            # 1. Скачиваем обновления
+            git pull
+            
+            # 2. Пересобираем контейнеры
+            docker compose up -d --build
+            
+            # 3. Чистим мусор (старые версии)
+            docker image prune -f
