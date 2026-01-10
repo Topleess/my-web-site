@@ -5,10 +5,20 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Contact from '../components/Contact';
 import { useProject } from '../hooks/useProject';
+import { useTranslation } from 'react-i18next';
 
 const ProjectPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { project, loading, error } = useProject(id ? Number(id) : undefined);
+  const { t, i18n } = useTranslation();
+  
+  // Функция для получения локализованного поля
+  const getLocalizedField = (project: any, field: 'title' | 'description') => {
+    if (i18n.language === 'en' && project[`${field}_en`]) {
+      return project[`${field}_en`];
+    }
+    return project[field];
+  };
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -29,9 +39,11 @@ const ProjectPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">⚠️ Ошибка</h1>
+          <h1 className="text-4xl font-bold mb-4">⚠️ {i18n.language === 'en' ? 'Error' : 'Ошибка'}</h1>
           <p className="text-gray-400 mb-6">{error}</p>
-          <Link to="/" className="text-[#FF4533] underline hover:text-white">Вернуться на главную</Link>
+          <Link to="/" className="text-[#FF4533] underline hover:text-white">
+            {i18n.language === 'en' ? 'Back to Home' : 'Вернуться на главную'}
+          </Link>
         </div>
       </div>
     );
@@ -42,8 +54,12 @@ const ProjectPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Проект не найден</h1>
-          <Link to="/" className="text-[#FF4533] underline hover:text-white">Вернуться на главную</Link>
+          <h1 className="text-4xl font-bold mb-4">
+            {i18n.language === 'en' ? 'Project Not Found' : 'Проект не найден'}
+          </h1>
+          <Link to="/" className="text-[#FF4533] underline hover:text-white">
+            {i18n.language === 'en' ? 'Back to Home' : 'Вернуться на главную'}
+          </Link>
         </div>
       </div>
     );
@@ -58,14 +74,16 @@ const ProjectPage: React.FC = () => {
         {/* Back Link */}
         <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 group">
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="uppercase tracking-widest text-xs font-bold">Назад</span>
+          <span className="uppercase tracking-widest text-xs font-bold">
+            {i18n.language === 'en' ? 'Back' : 'Назад'}
+          </span>
         </Link>
 
         {/* Header Section */}
         <div className="mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/20 pb-10">
             <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none">
-              {project.title}
+              {getLocalizedField(project, 'title')}
             </h1>
             <span className="text-[#FF4533] font-mono text-lg md:text-xl">
               // {project.year}
@@ -88,27 +106,35 @@ const ProjectPage: React.FC = () => {
           {/* Sidebar Info */}
           <div className="col-span-1 space-y-8">
             <div>
-              <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">Категория</h3>
+              <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">
+                {t('projects.category')}
+              </h3>
               <p className="text-xl font-medium">{project.category}</p>
             </div>
             
             {project.client && (
               <div>
-                <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">Клиент</h3>
+                <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">
+                  {t('projects.client')}
+                </h3>
                 <p className="text-xl font-medium">{project.client}</p>
               </div>
             )}
 
             {project.role && (
               <div>
-                <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">Роль</h3>
+                <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">
+                  {t('projects.role')}
+                </h3>
                 <p className="text-xl font-medium">{project.role}</p>
               </div>
             )}
             
             <div>
-              <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">Статус</h3>
-              <p className={`text-xl font-medium ${project.status === 'В работе' ? 'text-yellow-500' : 'text-green-500'}`}>
+              <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">
+                {t('projects.status')}
+              </h3>
+              <p className={`text-xl font-medium ${project.status === 'В работе' || project.status === 'In Progress' ? 'text-yellow-500' : 'text-green-500'}`}>
                 {project.status}
               </p>
             </div>
@@ -116,14 +142,19 @@ const ProjectPage: React.FC = () => {
 
           {/* Main Description */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-3xl font-bold mb-6">О проекте</h3>
+            <h3 className="text-3xl font-bold mb-6">
+              {i18n.language === 'en' ? 'About the Project' : 'О проекте'}
+            </h3>
             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              {project.description}
+              {getLocalizedField(project, 'description')}
             </p>
             
             {/* Additional content placeholder */}
             <p className="mt-6 text-lg md:text-xl text-gray-300 leading-relaxed">
-              Разработка этого проекта включала в себя глубокий анализ потребностей пользователей и создание уникальной визуальной системы, которая отличает бренд от конкурентов. Мы использовали современные технологии для обеспечения максимальной производительности.
+              {i18n.language === 'en' 
+                ? 'The development of this project involved a deep analysis of user needs and the creation of a unique visual system that distinguishes the brand from competitors. We used modern technologies to ensure maximum performance.'
+                : 'Разработка этого проекта включала в себя глубокий анализ потребностей пользователей и создание уникальной визуальной системы, которая отличает бренд от конкурентов. Мы использовали современные технологии для обеспечения максимальной производительности.'
+              }
             </p>
           </div>
         </div>

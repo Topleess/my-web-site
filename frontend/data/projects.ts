@@ -11,6 +11,8 @@ export interface Project {
   client?: string;
   role?: string;
   images: string[];
+  title_en?: string;
+  description_en?: string;
 }
 
 export const projectsData: Project[] = [

@@ -1,7 +1,10 @@
 import React from 'react';
 import { Instagram, Linkedin, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Hero: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  
   return (
     <section className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-black">
       {/* Background Image */}
@@ -19,9 +22,19 @@ const Hero: React.FC = () => {
       <div className="relative z-10 w-full px-4 md:px-10 flex flex-col items-center justify-center h-full pointer-events-none mix-blend-difference">
         {/* Changed leading from 0.85 to 0.95 to increase spacing between lines */}
         <h1 className="text-white font-black text-[12vw] md:text-[13vw] leading-[0.95] tracking-tighter text-center uppercase select-none">
-          Александр
-          <br />
-          <span className="ml-[10vw] md:ml-[15vw]">Шамшурин</span>
+          {i18n.language === 'en' ? (
+            <>
+              Alexander
+              <br />
+              <span className="ml-[10vw] md:ml-[15vw]">Shamshurin</span>
+            </>
+          ) : (
+            <>
+              Александр
+              <br />
+              <span className="ml-[10vw] md:ml-[15vw]">Шамшурин</span>
+            </>
+          )}
         </h1>
       </div>
 
@@ -47,11 +60,23 @@ const Hero: React.FC = () => {
         {/* Role / Description */}
         <div className="text-right">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight">
-            // Разработка,
-            <br />
-            Дизайн &
-            <br />
-            Менеджмент
+            {i18n.language === 'en' ? (
+              <>
+                // Development,
+                <br />
+                Design &
+                <br />
+                Management
+              </>
+            ) : (
+              <>
+                // Разработка,
+                <br />
+                Дизайн &
+                <br />
+                Менеджмент
+              </>
+            )}
           </h2>
         </div>
       </div>

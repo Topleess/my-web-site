@@ -31,6 +31,10 @@ class Project(Model):
     role = fields.CharField(max_length=255, null=True)
     images = fields.JSONField(default=list)  # Array of additional image URLs
     
+    # Английские переводы
+    title_en = fields.CharField(max_length=255, null=True)
+    description_en = fields.TextField(null=True)
+    
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
     

@@ -1,0 +1,41 @@
+{
+  "header": {
+    "title": "as-shamshurin",
+    "projects": "Projects",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "hero": {
+    "greeting": "Hello! My name is",
+    "name": "Alexander Shamshurin",
+    "description": "I'm a designer, developer, and entrepreneur. I specialize in creating digital products from concept to implementation."
+  },
+  "projects": {
+    "title": "My Projects",
+    "viewProject": "View Project",
+    "category": "Category",
+    "status": "Status",
+    "year": "Year",
+    "client": "Client",
+    "role": "Role"
+  },
+  "about": {
+    "title": "About Me",
+    "description": "I've been working in design and development for over 5 years. My experience includes working on various projects — from startups to large corporate solutions."
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Let's discuss your next project. I'm always open to new challenges and interesting opportunities.",
+    "email": "Email",
+    "telegram": "Telegram",
+    "github": "GitHub"
+  },
+  "footer": {
+    "rights": "All rights reserved"
+  },
+  "common": {
+    "switchLanguage": "Переключить на Русский",
+    "loading": "Loading...",
+    "error": "An error occurred"
+  }
+}

@@ -13,6 +13,8 @@ class ProjectBase(BaseModel):
     client: Optional[str] = Field(None, description="Client name")
     role: Optional[str] = Field(None, description="Your role in project")
     images: List[str] = Field(default_factory=list, description="Additional images")
+    title_en: Optional[str] = Field(None, description="Project title in English")
+    description_en: Optional[str] = Field(None, description="Project description in English")
 
 
 class ProjectCreate(ProjectBase):
@@ -31,6 +33,8 @@ class ProjectUpdate(BaseModel):
     client: Optional[str] = None
     role: Optional[str] = None
     images: Optional[List[str]] = None
+    title_en: Optional[str] = None
+    description_en: Optional[str] = None
 
 
 class ProjectResponse(ProjectBase):

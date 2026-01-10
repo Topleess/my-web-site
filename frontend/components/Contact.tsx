@@ -1,7 +1,10 @@
 import React from 'react';
 import { Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Contact: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  
   return (
     <section id="contact" className="w-full bg-[#050505] text-white py-24 px-4 md:px-10 flex flex-col justify-center min-h-[70vh]">
       <div className="w-full mx-auto max-w-screen-2xl flex flex-col relative">
@@ -9,7 +12,7 @@ const Contact: React.FC = () => {
         {/* Sticky Label (Text Only) - Left Aligned */}
         <div className="sticky top-20 z-20 mb-8 self-start mix-blend-difference pointer-events-none">
            <span className="text-[#FF4533] font-bold text-sm tracking-widest uppercase inline-block">
-            // Связаться
+            // {t('contact.title')}
           </span>
         </div>
 
@@ -17,12 +20,16 @@ const Contact: React.FC = () => {
         <div className="flex flex-col items-center text-center w-full">
           {/* Big Headline */}
           <h2 className="text-[12vw] leading-[0.9] font-black uppercase tracking-tighter mb-8 md:mb-12">
-            Есть <span className="text-[#FF4533]">Идея?</span>
+            {i18n.language === 'en' ? (
+              <>Have an <span className="text-[#FF4533]">Idea?</span></>
+            ) : (
+              <>Есть <span className="text-[#FF4533]">Идея?</span></>
+            )}
           </h2>
 
           {/* Subtext */}
           <p className="text-gray-400 text-lg md:text-2xl max-w-2xl mb-16 font-light leading-relaxed">
-            Давайте обсудим ваш следующий проект. Я всегда открыт для новых вызовов и интересных предложений.
+            {t('contact.description')}
           </p>
 
           {/* Actions */}
@@ -37,7 +44,9 @@ const Contact: React.FC = () => {
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               <Send size={24} />
-              <span className="font-bold uppercase tracking-wider relative z-10">Связаться в Telegram</span>
+              <span className="font-bold uppercase tracking-wider relative z-10">
+                {i18n.language === 'en' ? 'Contact on Telegram' : 'Связаться в Telegram'}
+              </span>
             </a>
 
           </div>

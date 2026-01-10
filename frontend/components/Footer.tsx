@@ -1,7 +1,9 @@
 import React from 'react';
 import { Instagram, Linkedin, Send, ArrowUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Footer: React.FC = () => {
+  const { t, i18n } = useTranslation();
   
   const scrollToTop = () => {
     window.scrollTo({
@@ -24,9 +26,15 @@ const Footer: React.FC = () => {
 
           {/* Navigation */}
           <div className="flex flex-wrap gap-8">
-            <a href="#about" className="text-sm font-medium hover:text-[#FF4533] transition-colors uppercase tracking-wider">Обо мне</a>
-            <a href="#projects" className="text-sm font-medium hover:text-[#FF4533] transition-colors uppercase tracking-wider">Проекты</a>
-            <a href="#contact" className="text-sm font-medium hover:text-[#FF4533] transition-colors uppercase tracking-wider">Связаться</a>
+            <a href="#about" className="text-sm font-medium hover:text-[#FF4533] transition-colors uppercase tracking-wider">
+              {t('header.about')}
+            </a>
+            <a href="#projects" className="text-sm font-medium hover:text-[#FF4533] transition-colors uppercase tracking-wider">
+              {t('header.projects')}
+            </a>
+            <a href="#contact" className="text-sm font-medium hover:text-[#FF4533] transition-colors uppercase tracking-wider">
+              {t('header.contact')}
+            </a>
           </div>
 
           {/* Scroll Top Button */}

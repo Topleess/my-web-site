@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,6 +10,13 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
+  const { t, i18n } = useTranslation();
+  
+  // Функция переключения языка
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'ru' ? 'en' : 'ru';
+    i18n.changeLanguage(newLang);
+  };
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -57,12 +65,12 @@ const Header: React.FC = () => {
           <div className="hidden md:flex items-center justify-between w-full font-medium tracking-wide uppercase">
             {/* Element 1 */}
             <Link to="/" className="text-base font-semibold hover:opacity-70 transition-opacity cursor-pointer">
-              as-shamshurin
+              {t('header.title')}
             </Link>
 
             {/* Element 2 */}
             <a href="#projects" onClick={(e) => handleNavClick(e, 'projects')} className="hover:opacity-70 transition-opacity flex items-center gap-2 cursor-pointer">
-              Проекты
+              {t('header.projects')}
               <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${isScrolled ? 'bg-white text-black' : 'bg-white text-black'}`}>
                 {projectCount}
               </span>
@@ -70,28 +78,49 @@ const Header: React.FC = () => {
 
             {/* Element 3 */}
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:opacity-70 transition-opacity cursor-pointer">
-              Обо мне
+              {t('header.about')}
             </a>
 
             {/* Element 4 */}
             <a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:opacity-70 transition-opacity cursor-pointer">
-              Связаться
+              {t('header.contact')}
             </a>
+            
+            {/* Language Switcher */}
+            <button
+              onClick={toggleLanguage}
+              className="hover:opacity-70 transition-opacity flex items-center gap-2 cursor-pointer"
+              title={t('common.switchLanguage')}
+            >
+              <Globe size={18} />
+              <span className="text-xs">{i18n.language.toUpperCase()}</span>
+            </button>
           </div>
 
           {/* MOBILE LAYOUT */}
           <div className="flex md:hidden items-center justify-between w-full">
             <Link to="/" className="text-sm font-semibold tracking-wide uppercase">
-              as-shamshurin
+              {t('header.title')}
             </Link>
 
-            <button 
-              className="focus:outline-none" 
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={toggleLanguage}
+                className="focus:outline-none flex items-center gap-1"
+                aria-label="Toggle language"
+              >
+                <Globe size={18} />
+                <span className="text-xs">{i18n.language.toUpperCase()}</span>
+              </button>
+              
+              <button 
+                className="focus:outline-none" 
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -104,7 +133,7 @@ const Header: React.FC = () => {
             onClick={(e) => handleNavClick(e, 'projects')}
             className="text-lg font-medium hover:text-gray-300 transition-colors flex items-center gap-2"
           >
-            Проекты
+            {t('header.projects')}
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-black">
               {projectCount}
             </span>
@@ -114,14 +143,14 @@ const Header: React.FC = () => {
             onClick={(e) => handleNavClick(e, 'about')}
             className="text-lg font-medium hover:text-gray-300 transition-colors"
           >
-            Обо мне
+            {t('header.about')}
           </a>
           <a
             href="#contact"
             onClick={(e) => handleNavClick(e, 'contact')}
             className="text-lg font-medium hover:text-gray-300 transition-colors"
           >
-            Связаться
+            {t('header.contact')}
           </a>
         </div>
       )}

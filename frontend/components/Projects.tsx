@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Category } from '../data/projects';
 import { useProjects } from '../hooks/useProjects';
 import { apiClient } from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 const categories: Category[] = ['Все', 'Дизайн', 'Разработка', 'Стартапы', 'Другое'];
 
@@ -13,6 +14,15 @@ const Projects: React.FC = () => {
     category: activeCategory 
   });
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+  const { t, i18n } = useTranslation();
+  
+  // Функция для получения локализованного поля
+  const getLocalizedField = (project: any, field: 'title' | 'description') => {
+    if (i18n.language === 'en' && project[`${field}_en`]) {
+      return project[`${field}_en`];
+    }
+    return project[field];
+  };
 
   // Загрузка подсчета категорий при монтировании компонента
   useEffect(() => {
@@ -46,7 +56,7 @@ const Projects: React.FC = () => {
         {/* Sticky Section Label */}
         <div className="sticky top-20 z-30 mb-12 mix-blend-difference pointer-events-none self-start">
              <span className="text-[#FF4533] font-bold text-sm tracking-widest uppercase inline-block">
-              // Проекты
+              // {t('projects.title')}
             </span>
         </div>
 
@@ -56,7 +66,11 @@ const Projects: React.FC = () => {
           {/* Title */}
           <div className="flex flex-col gap-4">
             <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase">
-              Избранные<br/>Работы
+              {i18n.language === 'en' ? (
+                <>Featured<br/>Works</>
+              ) : (
+                <>Избранные<br/>Работы</>
+              )}
             </h2>
           </div>
 
@@ -137,10 +151,10 @@ const Projects: React.FC = () => {
                 {/* Bottom: Title & Meta */}
                 <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                   <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-2 text-white">
-                    {project.title}
+                    {getLocalizedField(project, 'title')}
                   </h3>
                   <div className="flex items-center gap-4 text-sm md:text-base text-gray-300 font-medium font-mono">
-                    <span className={project.status === 'В работе' ? 'text-yellow-400' : 'text-green-400'}>
+                    <span className={project.status === 'В работе' || project.status === 'In Progress' ? 'text-yellow-400' : 'text-green-400'}>
                        ● {project.status}
                     </span>
                     <span className="text-gray-500">/</span>
@@ -156,7 +170,7 @@ const Projects: React.FC = () => {
         
         {!loading && !error && filteredProjects.length === 0 && (
           <div className="w-full py-20 text-center text-gray-500 uppercase tracking-widest">
-            Нет проектов в этой категории
+            {i18n.language === 'en' ? 'No projects in this category' : 'Нет проектов в этой категории'}
           </div>
         )}
 
