@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, Globe } from 'lucide-react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { apiClient } from '../api/client';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const projectCount = 5; 
+  const [projectCount, setProjectCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
@@ -19,6 +20,18 @@ const Header: React.FC = () => {
   };
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Загрузка количества проектов
+  useEffect(() => {
+    const fetchProjectCount = async () => {
+      const response = await apiClient.getProjects();
+      if (response.data) {
+        setProjectCount(response.data.total);
+      }
+    };
+    
+    fetchProjectCount();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
