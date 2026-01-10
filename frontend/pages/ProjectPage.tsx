@@ -164,14 +164,6 @@ const ProjectPage: React.FC = () => {
             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
               {getLocalizedField(project, 'description')}
             </p>
-            
-            {/* Additional content placeholder */}
-            <p className="mt-6 text-lg md:text-xl text-gray-300 leading-relaxed">
-              {i18n.language === 'en' 
-                ? 'The development of this project involved a deep analysis of user needs and the creation of a unique visual system that distinguishes the brand from competitors. We used modern technologies to ensure maximum performance.'
-                : 'Разработка этого проекта включала в себя глубокий анализ потребностей пользователей и создание уникальной визуальной системы, которая отличает бренд от конкурентов. Мы использовали современные технологии для обеспечения максимальной производительности.'
-              }
-            </p>
           </div>
         </div>
 
