@@ -19,6 +19,22 @@ const ProjectPage: React.FC = () => {
     }
     return project[field];
   };
+  
+  // Функция для получения локализованной категории
+  const getLocalizedCategory = (project: any) => {
+    if (i18n.language === 'en' && project.category_en) {
+      return project.category_en;
+    }
+    return project.category;
+  };
+  
+  // Функция для получения локализованного статуса
+  const getLocalizedStatus = (project: any) => {
+    if (i18n.language === 'en' && project.status_en) {
+      return project.status_en;
+    }
+    return project.status;
+  };
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -109,7 +125,7 @@ const ProjectPage: React.FC = () => {
               <h3 className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                 {t('projects.category')}
               </h3>
-              <p className="text-xl font-medium">{project.category}</p>
+              <p className="text-xl font-medium">{getLocalizedCategory(project)}</p>
             </div>
             
             {project.client && (
@@ -135,7 +151,7 @@ const ProjectPage: React.FC = () => {
                 {t('projects.status')}
               </h3>
               <p className={`text-xl font-medium ${project.status === 'В работе' || project.status === 'In Progress' ? 'text-yellow-500' : 'text-green-500'}`}>
-                {project.status}
+                {getLocalizedStatus(project)}
               </p>
             </div>
           </div>

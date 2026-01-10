@@ -6,7 +6,7 @@ import logging
 
 from app.config import settings
 from app.database import init_db, close_db
-from app.models import Project, CATEGORY_TRANSLATIONS
+from app.models import Project, CATEGORY_TRANSLATIONS, STATUS_TRANSLATIONS
 from app.schemas import (
     ProjectResponse, 
     ProjectListResponse, 
@@ -116,6 +116,7 @@ async def get_projects(
                 "category": project.category,
                 "category_en": CATEGORY_TRANSLATIONS.get(project.category, project.category),
                 "status": project.status,
+                "status_en": STATUS_TRANSLATIONS.get(project.status, project.status),
                 "year": project.year,
                 "image": project.image,
                 "description": project.description,
@@ -150,7 +151,27 @@ async def get_project(project_id: int):
         if not project:
             raise HTTPException(status_code=404, detail="Project not found")
         
-        return project
+        # Добавим переводы
+        project_dict = {
+            "id": project.id,
+            "title": project.title,
+            "title_en": project.title_en,
+            "category": project.category,
+            "category_en": CATEGORY_TRANSLATIONS.get(project.category, project.category),
+            "status": project.status,
+            "status_en": STATUS_TRANSLATIONS.get(project.status, project.status),
+            "year": project.year,
+            "image": project.image,
+            "description": project.description,
+            "description_en": project.description_en,
+            "client": project.client,
+            "role": project.role,
+            "images": project.images,
+            "created_at": project.created_at,
+            "updated_at": project.updated_at,
+        }
+        
+        return project_dict
     except HTTPException:
         raise
     except Exception as e:

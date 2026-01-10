@@ -43,15 +43,15 @@ const Hero: React.FC = () => {
         
         {/* Social Links */}
         <div className="flex flex-col space-y-3 mb-6 md:mb-0">
-          <a href="#" className="flex items-center space-x-2 hover:opacity-70 transition-opacity group">
+          <a href="https://t.me/ShamshurinAS" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 hover:opacity-70 transition-opacity group">
             <Send size={20} className="group-hover:scale-110 transition-transform"/>
             <span className="text-sm font-medium">Telegram</span>
           </a>
-          <a href="#" className="flex items-center space-x-2 hover:opacity-70 transition-opacity group">
+          <a href="https://www.linkedin.com/in/alexander-shamshurin-244702343?jobid=1234&lipi=urn%3Ali%3Apage%3Ad_jobs_easyapply_pdfgenresume%3BLq%2FGtZOHR6CMJKkD%2BOBCZA%3D%3D&licu=urn%3Ali%3Acontrol%3Ad_jobs_easyapply_pdfgenresume-v02_profile" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 hover:opacity-70 transition-opacity group">
             <Linkedin size={20} className="group-hover:scale-110 transition-transform"/>
             <span className="text-sm font-medium">LinkedIn</span>
           </a>
-          <a href="#" className="flex items-center space-x-2 hover:opacity-70 transition-opacity group">
+          <a href="https://www.instagram.com/as_shamshurin?igsh=cG5nanV5Yjl6Y2Fn&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 hover:opacity-70 transition-opacity group">
             <Instagram size={20} className="group-hover:scale-110 transition-transform"/>
             <span className="text-sm font-medium">Instagram</span>
           </a>

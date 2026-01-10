@@ -6,6 +6,7 @@ export interface Project {
   category: Exclude<Category, 'Все' | 'All'>;
   category_en?: string;
   status: 'В работе' | 'Завершен' | 'In Progress' | 'Completed';
+  status_en?: string;
   year: string;
   image: string;
   description: string;

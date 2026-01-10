@@ -36,6 +36,14 @@ const Projects: React.FC = () => {
     }
     return project.category;
   };
+  
+  // Функция для получения локализованного статуса
+  const getLocalizedStatus = (project: any) => {
+    if (i18n.language === 'en' && project.status_en) {
+      return project.status_en;
+    }
+    return project.status;
+  };
 
   // Загрузка категорий с учетом языка
   useEffect(() => {
@@ -182,7 +190,7 @@ const Projects: React.FC = () => {
                   </h3>
                   <div className="flex items-center gap-4 text-sm md:text-base text-gray-300 font-medium font-mono">
                     <span className={project.status === 'В работе' || project.status === 'In Progress' ? 'text-yellow-400' : 'text-green-400'}>
-                       ● {project.status}
+                       ● {getLocalizedStatus(project)}
                     </span>
                     <span className="text-gray-500">/</span>
                     <span>{project.year}</span>

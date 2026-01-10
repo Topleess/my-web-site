@@ -16,6 +16,7 @@ class ProjectBase(BaseModel):
     title_en: Optional[str] = Field(None, description="Project title in English")
     description_en: Optional[str] = Field(None, description="Project description in English")
     category_en: Optional[str] = Field(None, description="Category in English")
+    status_en: Optional[str] = Field(None, description="Status in English")
 
 
 class ProjectCreate(ProjectBase):

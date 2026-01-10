@@ -27,6 +27,15 @@ CATEGORY_TRANSLATIONS = {
 # Обратный маппинг
 CATEGORY_TRANSLATIONS_REVERSE = {v: k for k, v in CATEGORY_TRANSLATIONS.items()}
 
+# Маппинг статусов на английский
+STATUS_TRANSLATIONS = {
+    "В работе": "In Progress",
+    "Завершен": "Completed"
+}
+
+# Обратный маппинг статусов
+STATUS_TRANSLATIONS_REVERSE = {v: k for k, v in STATUS_TRANSLATIONS.items()}
+
 
 class Project(Model):
     """
