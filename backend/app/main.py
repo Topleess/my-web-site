@@ -6,7 +6,7 @@ import logging
 
 from app.config import settings
 from app.database import init_db, close_db
-from app.models import Project
+from app.models import Project, CATEGORY_TRANSLATIONS
 from app.schemas import (
     ProjectResponse, 
     ProjectListResponse, 
@@ -67,20 +67,33 @@ async def get_projects(
     category: Optional[str] = Query(None, description="Filter by category"),
     status: Optional[str] = Query(None, description="Filter by status"),
     limit: Optional[int] = Query(None, description="Limit number of results"),
+    lang: Optional[str] = Query("ru", description="Language code (ru/en)"),
 ):
     """
     Get all projects with optional filters
     
-    - **category**: Filter by category (Дизайн, Разработка, Стартапы, Другое)
+    - **category**: Filter by category (works with both RU and EN names)
     - **status**: Filter by status (В работе, Завершен)
     - **limit**: Limit number of results
+    - **lang**: Language for response (ru/en)
     """
     try:
         query = Project.all()
         
-        # Apply filters
-        if category and category != "Все":
-            query = query.filter(category=category)
+        # Apply filters - поддержка фильтрации и по русским и по английским названиям
+        if category and category != "Все" and category != "All":
+            # Попробуем найти по русскому названию или по английскому
+            ru_category = category
+            # Если передана английская категория, конвертируем в русскую для фильтра
+            if category in ["Design", "Development", "Startups", "Other"]:
+                category_map = {
+                    "Design": "Дизайн",
+                    "Development": "Разработка", 
+                    "Startups": "Стартапы",
+                    "Other": "Другое"
+                }
+                ru_category = category_map.get(category, category)
+            query = query.filter(category=ru_category)
         if status:
             query = query.filter(status=status)
         
@@ -93,8 +106,30 @@ async def get_projects(
         
         projects = await query
         
+        # Добавим переводы категорий в ответ
+        projects_data = []
+        for project in projects:
+            project_dict = {
+                "id": project.id,
+                "title": project.title,
+                "title_en": project.title_en,
+                "category": project.category,
+                "category_en": CATEGORY_TRANSLATIONS.get(project.category, project.category),
+                "status": project.status,
+                "year": project.year,
+                "image": project.image,
+                "description": project.description,
+                "description_en": project.description_en,
+                "client": project.client,
+                "role": project.role,
+                "images": project.images,
+                "created_at": project.created_at,
+                "updated_at": project.updated_at,
+            }
+            projects_data.append(project_dict)
+        
         return {
-            "projects": projects,
+            "projects": projects_data,
             "total": total
         }
     except Exception as e:
@@ -189,16 +224,32 @@ async def delete_project(project_id: int):
 
 
 @app.get("/api/categories")
-async def get_categories():
+async def get_categories(lang: Optional[str] = Query("ru", description="Language code (ru/en)")):
     """Get all available categories with project counts"""
     try:
-        categories = [
-            {"name": "Все", "count": await Project.all().count()},
-            {"name": "Дизайн", "count": await Project.filter(category="Дизайн").count()},
-            {"name": "Разработка", "count": await Project.filter(category="Разработка").count()},
-            {"name": "Стартапы", "count": await Project.filter(category="Стартапы").count()},
-            {"name": "Другое", "count": await Project.filter(category="Другое").count()},
-        ]
+        all_count = await Project.all().count()
+        design_count = await Project.filter(category="Дизайн").count()
+        dev_count = await Project.filter(category="Разработка").count()
+        startup_count = await Project.filter(category="Стартапы").count()
+        other_count = await Project.filter(category="Другое").count()
+        
+        if lang == "en":
+            categories = [
+                {"name": "All", "name_ru": "Все", "count": all_count},
+                {"name": "Design", "name_ru": "Дизайн", "count": design_count},
+                {"name": "Development", "name_ru": "Разработка", "count": dev_count},
+                {"name": "Startups", "name_ru": "Стартапы", "count": startup_count},
+                {"name": "Other", "name_ru": "Другое", "count": other_count},
+            ]
+        else:
+            categories = [
+                {"name": "Все", "name_en": "All", "count": all_count},
+                {"name": "Дизайн", "name_en": "Design", "count": design_count},
+                {"name": "Разработка", "name_en": "Development", "count": dev_count},
+                {"name": "Стартапы", "name_en": "Startups", "count": startup_count},
+                {"name": "Другое", "name_en": "Other", "count": other_count},
+            ]
+        
         return {"categories": categories}
     except Exception as e:
         logger.error(f"Error fetching categories: {e}")

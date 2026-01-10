@@ -15,6 +15,7 @@ class ProjectBase(BaseModel):
     images: List[str] = Field(default_factory=list, description="Additional images")
     title_en: Optional[str] = Field(None, description="Project title in English")
     description_en: Optional[str] = Field(None, description="Project description in English")
+    category_en: Optional[str] = Field(None, description="Category in English")
 
 
 class ProjectCreate(ProjectBase):

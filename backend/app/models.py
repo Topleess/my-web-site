@@ -16,6 +16,18 @@ class StatusEnum(str, Enum):
     COMPLETED = "Завершен"
 
 
+# Маппинг категорий на английский
+CATEGORY_TRANSLATIONS = {
+    "Дизайн": "Design",
+    "Разработка": "Development",
+    "Стартапы": "Startups",
+    "Другое": "Other"
+}
+
+# Обратный маппинг
+CATEGORY_TRANSLATIONS_REVERSE = {v: k for k, v in CATEGORY_TRANSLATIONS.items()}
+
+
 class Project(Model):
     """
     Project model representing portfolio projects

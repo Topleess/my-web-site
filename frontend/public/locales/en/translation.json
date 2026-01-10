@@ -23,6 +23,12 @@
     "title": "About Me",
     "description": "I've been working in design and development for over 5 years. My experience includes working on various projects — from startups to large corporate solutions."
   },
+  "intro": {
+    "label": "About Me",
+    "headline": "I'm an experienced manager and creator of elegant solutions. I turn chaos into structure, and ideas into successful products.",
+    "description": "My approach combines strategic thinking and attention to detail. I help teams find the right direction and create conditions for implementing the boldest projects.",
+    "button": "View Work"
+  },
   "contact": {
     "title": "Contact",
     "description": "Let's discuss your next project. I'm always open to new challenges and interesting opportunities.",

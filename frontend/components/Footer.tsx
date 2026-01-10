@@ -57,9 +57,15 @@ const Footer: React.FC = () => {
 
           {/* Social Icons */}
           <div className="flex gap-6">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Send size={18} /></a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Linkedin size={18} /></a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Instagram size={18} /></a>
+            <a href="https://t.me/ShamshurinAS" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <Send size={18} />
+            </a>
+            <a href="https://www.linkedin.com/in/alexander-shamshurin-244702343?jobid=1234&lipi=urn%3Ali%3Apage%3Ad_jobs_easyapply_pdfgenresume%3BLq%2FGtZOHR6CMJKkD%2BOBCZA%3D%3D&licu=urn%3Ali%3Acontrol%3Ad_jobs_easyapply_pdfgenresume-v02_profile" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <Linkedin size={18} />
+            </a>
+            <a href="https://www.instagram.com/as_shamshurin?igsh=cG5nanV5Yjl6Y2Fn&utm_source=qr" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <Instagram size={18} />
+            </a>
           </div>
         </div>
 

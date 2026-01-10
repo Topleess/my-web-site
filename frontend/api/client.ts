@@ -15,6 +15,8 @@ export interface ProjectsListResponse {
 export interface CategoriesResponse {
   categories: Array<{
     name: string;
+    name_en?: string;
+    name_ru?: string;
     count: number;
   }>;
 }
@@ -51,10 +53,11 @@ class ApiClient {
     category?: string;
     status?: string;
     limit?: number;
+    lang?: string;
   }): Promise<ApiResponse<ProjectsListResponse>> {
     const queryParams = new URLSearchParams();
     
-    if (params?.category && params.category !== 'Все') {
+    if (params?.category && params.category !== 'Все' && params.category !== 'All') {
       queryParams.append('category', params.category);
     }
     if (params?.status) {
@@ -62,6 +65,9 @@ class ApiClient {
     }
     if (params?.limit) {
       queryParams.append('limit', params.limit.toString());
+    }
+    if (params?.lang) {
+      queryParams.append('lang', params.lang);
     }
     
     const query = queryParams.toString();
@@ -80,8 +86,9 @@ class ApiClient {
   /**
    * Get all categories with counts
    */
-  async getCategories(): Promise<ApiResponse<CategoriesResponse>> {
-    return this.request<CategoriesResponse>('/api/categories');
+  async getCategories(lang?: string): Promise<ApiResponse<CategoriesResponse>> {
+    const endpoint = lang ? `/api/categories?lang=${lang}` : '/api/categories';
+    return this.request<CategoriesResponse>(endpoint);
   }
 
   /**

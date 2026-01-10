@@ -1,10 +1,11 @@
-export type Category = 'Все' | 'Дизайн' | 'Разработка' | 'Стартапы' | 'Другое';
+export type Category = 'Все' | 'Дизайн' | 'Разработка' | 'Стартапы' | 'Другое' | 'All' | 'Design' | 'Development' | 'Startups' | 'Other';
 
 export interface Project {
   id: number;
   title: string;
-  category: Exclude<Category, 'Все'>;
-  status: 'В работе' | 'Завершен';
+  category: Exclude<Category, 'Все' | 'All'>;
+  category_en?: string;
+  status: 'В работе' | 'Завершен' | 'In Progress' | 'Completed';
   year: string;
   image: string;
   description: string;

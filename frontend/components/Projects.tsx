@@ -6,15 +6,20 @@ import { useProjects } from '../hooks/useProjects';
 import { apiClient } from '../api/client';
 import { useTranslation } from 'react-i18next';
 
-const categories: Category[] = ['Все', 'Дизайн', 'Разработка', 'Стартапы', 'Другое'];
+interface CategoryItem {
+  name: string;
+  name_en?: string;
+  name_ru?: string;
+  count: number;
+}
 
 const Projects: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState<Category>('Все');
+  const { t, i18n } = useTranslation();
+  const [activeCategory, setActiveCategory] = useState<Category>(i18n.language === 'en' ? 'All' : 'Все');
   const { projects: filteredProjects, loading, error } = useProjects({ 
     category: activeCategory 
   });
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
-  const { t, i18n } = useTranslation();
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   
   // Функция для получения локализованного поля
   const getLocalizedField = (project: any, field: 'title' | 'description') => {
@@ -23,30 +28,52 @@ const Projects: React.FC = () => {
     }
     return project[field];
   };
+  
+  // Функция для получения локализованной категории
+  const getLocalizedCategory = (project: any) => {
+    if (i18n.language === 'en' && project.category_en) {
+      return project.category_en;
+    }
+    return project.category;
+  };
 
-  // Загрузка подсчета категорий при монтировании компонента
+  // Загрузка категорий с учетом языка
   useEffect(() => {
-    const fetchCategoryCounts = async () => {
-      const response = await apiClient.getCategories();
+    const fetchCategories = async () => {
+      const response = await apiClient.getCategories(i18n.language);
       if (response.data) {
-        const counts: Record<string, number> = {};
-        let totalCount = 0;
-        
-        response.data.categories.forEach(cat => {
-          counts[cat.name] = cat.count;
-          totalCount += cat.count;
-        });
-        
-        counts['Все'] = totalCount;
-        setCategoryCounts(counts);
+        setCategories(response.data.categories);
       }
     };
     
-    fetchCategoryCounts();
-  }, []);
+    fetchCategories();
+  }, [i18n.language]);
+  
+  // Обновление активной категории при смене языка
+  useEffect(() => {
+    if (i18n.language === 'en') {
+      const categoryMap: Record<string, Category> = {
+        'Все': 'All',
+        'Дизайн': 'Design',
+        'Разработка': 'Development',
+        'Стартапы': 'Startups',
+        'Другое': 'Other'
+      };
+      setActiveCategory(categoryMap[activeCategory as string] || 'All');
+    } else {
+      const categoryMap: Record<string, Category> = {
+        'All': 'Все',
+        'Design': 'Дизайн',
+        'Development': 'Разработка',
+        'Startups': 'Стартапы',
+        'Other': 'Другое'
+      };
+      setActiveCategory(categoryMap[activeCategory as string] || 'Все');
+    }
+  }, [i18n.language]);
 
-  const getCount = (cat: Category) => {
-    return categoryCounts[cat] || 0;
+  const getCount = (cat: CategoryItem) => {
+    return cat.count || 0;
   };
 
   return (
@@ -78,22 +105,22 @@ const Projects: React.FC = () => {
           <div className="flex flex-wrap gap-3 md:gap-4">
             {categories.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                key={cat.name}
+                onClick={() => setActiveCategory(cat.name as Category)}
                 className={`
                   px-5 py-2 md:px-6 md:py-3 
                   rounded-full border 
                   text-xs md:text-sm font-bold uppercase tracking-widest 
                   transition-all duration-300 
                   flex items-center gap-2
-                  ${activeCategory === cat 
+                  ${activeCategory === cat.name 
                     ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
                     : 'bg-transparent text-gray-500 border-white/20 hover:border-white hover:text-white'
                   }
                 `}
               >
-                {cat}
-                <span className={`text-[10px] align-top opacity-60 ${activeCategory === cat ? 'text-black font-extrabold' : ''}`}>
+                {cat.name}
+                <span className={`text-[10px] align-top opacity-60 ${activeCategory === cat.name ? 'text-black font-extrabold' : ''}`}>
                   {getCount(cat)}
                 </span>
               </button>
@@ -141,7 +168,7 @@ const Projects: React.FC = () => {
                 {/* Top: Category & Arrow */}
                 <div className="flex justify-between items-start w-full transform -translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                   <span className="text-[#FF4533] text-xs font-bold tracking-widest uppercase border border-[#FF4533] px-2 py-1 rounded-sm">
-                    {project.category}
+                    {getLocalizedCategory(project)}
                   </span>
                   <div className="bg-white text-black p-2 rounded-full">
                     <ArrowUpRight size={20} />
