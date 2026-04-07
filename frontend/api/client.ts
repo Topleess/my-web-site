@@ -1,6 +1,10 @@
-import { Project } from '../data/projects';
+import { createClient } from '@supabase/supabase-js';
+import { Case } from '../data/projects';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface ApiResponse<T> {
   data?: T;
@@ -8,7 +12,7 @@ export interface ApiResponse<T> {
 }
 
 export interface ProjectsListResponse {
-  projects: Project[];
+  projects: Case[];
   total: number;
 }
 
@@ -22,82 +26,102 @@ export interface CategoriesResponse {
 }
 
 class ApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
-  private async request<T>(endpoint: string): Promise<ApiResponse<T>> {
-    try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return { data };
-    } catch (error) {
-      console.error('API request failed:', error);
-      return { 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
-      };
-    }
-  }
-
   /**
-   * Get all projects with optional filters
+   * Get all cases with optional filters
    */
   async getProjects(params?: {
     category?: string;
-    status?: string;
     limit?: number;
     lang?: string;
   }): Promise<ApiResponse<ProjectsListResponse>> {
-    const queryParams = new URLSearchParams();
-    
-    if (params?.category && params.category !== 'Все' && params.category !== 'All') {
-      queryParams.append('category', params.category);
+    try {
+      let query = supabase
+        .from('cases')
+        .select('*')
+        .eq('published', true)
+        .order('sort_order', { ascending: true });
+
+      if (params?.category && params.category !== 'Все' && params.category !== 'All') {
+        query = query.or(`category_ru.eq.${params.category},category_en.eq.${params.category}`);
+      }
+
+      if (params?.limit) {
+        query = query.limit(params.limit);
+      }
+
+      const { data, error } = await query;
+
+      if (error) return { error: error.message };
+
+      return {
+        data: {
+          projects: (data as Case[]) || [],
+          total: data?.length || 0,
+        },
+      };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
-    if (params?.status) {
-      queryParams.append('status', params.status);
-    }
-    if (params?.limit) {
-      queryParams.append('limit', params.limit.toString());
-    }
-    if (params?.lang) {
-      queryParams.append('lang', params.lang);
-    }
-    
-    const query = queryParams.toString();
-    const endpoint = `/api/projects${query ? `?${query}` : ''}`;
-    
-    return this.request<ProjectsListResponse>(endpoint);
   }
 
   /**
-   * Get a single project by ID
+   * Get a single case by slug
    */
-  async getProject(id: number): Promise<ApiResponse<Project>> {
-    return this.request<Project>(`/api/projects/${id}`);
+  async getProject(slug: string): Promise<ApiResponse<Case>> {
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('slug', slug)
+        .eq('published', true)
+        .single();
+
+      if (error) return { error: error.message };
+      return { data: data as Case };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   }
 
   /**
    * Get all categories with counts
    */
   async getCategories(lang?: string): Promise<ApiResponse<CategoriesResponse>> {
-    const endpoint = lang ? `/api/categories?lang=${lang}` : '/api/categories';
-    return this.request<CategoriesResponse>(endpoint);
-  }
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('category_ru, category_en')
+        .eq('published', true);
 
-  /**
-   * Check API health
-   */
-  async healthCheck(): Promise<ApiResponse<{ message: string }>> {
-    return this.request<{ message: string }>('/api/health');
+      if (error) return { error: error.message };
+
+      const counts: Record<string, { ru: string; en: string; count: number }> = {};
+      for (const row of data || []) {
+        const key = row.category_ru as string;
+        if (!counts[key]) {
+          counts[key] = { ru: row.category_ru, en: row.category_en, count: 0 };
+        }
+        counts[key].count++;
+      }
+
+      const totalCount = data?.length || 0;
+      const allLabel = lang === 'en' ? 'All' : 'Все';
+
+      const categories = [
+        { name: allLabel, name_en: 'All', name_ru: 'Все', count: totalCount },
+        ...Object.values(counts).map(({ ru, en, count }) => ({
+          name: lang === 'en' ? en : ru,
+          name_en: en,
+          name_ru: ru,
+          count,
+        })),
+      ];
+
+      return { data: { categories } };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   }
 }
 
-// Export singleton instance
-export const apiClient = new ApiClient(API_URL);
+export const apiClient = new ApiClient();

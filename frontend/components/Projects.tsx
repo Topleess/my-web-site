@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Category } from '../data/projects';
+import { Case, Category } from '../data/projects';
 import { useProjects } from '../hooks/useProjects';
 import { apiClient } from '../api/client';
 import { useTranslation } from 'react-i18next';
@@ -20,29 +20,20 @@ const Projects: React.FC = () => {
     category: activeCategory 
   });
   const [categories, setCategories] = useState<CategoryItem[]>([]);
-  
-  // Функция для получения локализованного поля
-  const getLocalizedField = (project: any, field: 'title' | 'description') => {
-    if (i18n.language === 'en' && project[`${field}_en`]) {
-      return project[`${field}_en`];
-    }
-    return project[field];
+
+  const getLocalizedCategory = (project: Case) => {
+    if (i18n.language === 'en') return project.category_en;
+    return project.category_ru;
   };
-  
-  // Функция для получения локализованной категории
-  const getLocalizedCategory = (project: any) => {
-    if (i18n.language === 'en' && project.category_en) {
-      return project.category_en;
-    }
-    return project.category;
+
+  const getLocalizedNiche = (project: Case) => {
+    if (i18n.language === 'en') return project.niche_en || project.category_en;
+    return project.niche_ru || project.category_ru;
   };
-  
-  // Функция для получения локализованного статуса
-  const getLocalizedStatus = (project: any) => {
-    if (i18n.language === 'en' && project.status_en) {
-      return project.status_en;
-    }
-    return project.status;
+
+  const getLocalizedPeriod = (project: Case) => {
+    if (i18n.language === 'en') return project.period_en || '';
+    return project.period_ru || '';
   };
 
   // Загрузка категорий с учетом языка
@@ -56,28 +47,10 @@ const Projects: React.FC = () => {
     
     fetchCategories();
   }, [i18n.language]);
-  
-  // Обновление активной категории при смене языка
+
+  // При смене языка переключаем активную категорию на "All"/"Все"
   useEffect(() => {
-    if (i18n.language === 'en') {
-      const categoryMap: Record<string, Category> = {
-        'Все': 'All',
-        'Дизайн': 'Design',
-        'Разработка': 'Development',
-        'Стартапы': 'Startups',
-        'Другое': 'Other'
-      };
-      setActiveCategory(categoryMap[activeCategory as string] || 'All');
-    } else {
-      const categoryMap: Record<string, Category> = {
-        'All': 'Все',
-        'Design': 'Дизайн',
-        'Development': 'Разработка',
-        'Startups': 'Стартапы',
-        'Other': 'Другое'
-      };
-      setActiveCategory(categoryMap[activeCategory as string] || 'Все');
-    }
+    setActiveCategory(i18n.language === 'en' ? 'All' : 'Все');
   }, [i18n.language]);
 
   const getCount = (cat: CategoryItem) => {
@@ -156,8 +129,8 @@ const Projects: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
             {filteredProjects.map((project) => (
             <Link 
-              to={`/project/${project.id}`}
-              key={project.id} 
+              to={`/project/${project.slug}`}
+              key={project.slug} 
               className="group relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-gray-900 cursor-pointer block"
             >
               {/* Image */}
@@ -186,14 +159,18 @@ const Projects: React.FC = () => {
                 {/* Bottom: Title & Meta */}
                 <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                   <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-2 text-white">
-                    {getLocalizedField(project, 'title')}
+                    {project.title}
                   </h3>
                   <div className="flex items-center gap-4 text-sm md:text-base text-gray-300 font-medium font-mono">
-                    <span className={project.status === 'В работе' || project.status === 'In Progress' ? 'text-yellow-400' : 'text-green-400'}>
-                       ● {getLocalizedStatus(project)}
+                    <span className="text-[#FF4533]">
+                       ● {getLocalizedNiche(project)}
                     </span>
-                    <span className="text-gray-500">/</span>
-                    <span>{project.year}</span>
+                    {getLocalizedPeriod(project) && (
+                      <>
+                        <span className="text-gray-500">/</span>
+                        <span>{getLocalizedPeriod(project)}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Project } from '../data/projects';
+import { Case } from '../data/projects';
 import { apiClient } from '../api/client';
 
 interface UseProjectsResult {
-  projects: Project[];
+  projects: Case[];
   loading: boolean;
   error: string | null;
   total: number;
@@ -11,7 +11,6 @@ interface UseProjectsResult {
 
 interface UseProjectsParams {
   category?: string;
-  status?: string;
   limit?: number;
 }
 
@@ -19,7 +18,7 @@ interface UseProjectsParams {
  * Custom hook for fetching projects from API
  */
 export function useProjects(params?: UseProjectsParams): UseProjectsResult {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Case[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState<number>(0);
@@ -52,7 +51,7 @@ export function useProjects(params?: UseProjectsParams): UseProjectsResult {
     return () => {
       isMounted = false;
     };
-  }, [params?.category, params?.status, params?.limit]);
+  }, [params?.category, params?.limit]);
 
   return { projects, loading, error, total };
 }

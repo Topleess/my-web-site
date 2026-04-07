@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Project } from '../data/projects';
+import { Case } from '../data/projects';
 import { apiClient } from '../api/client';
 
 interface UseProjectResult {
-  project: Project | null;
+  project: Case | null;
   loading: boolean;
   error: string | null;
 }
 
 /**
- * Custom hook for fetching a single project from API
+ * Custom hook for fetching a single case by slug from Supabase
  */
-export function useProject(id: number | undefined): UseProjectResult {
-  const [project, setProject] = useState<Project | null>(null);
+export function useProject(slug: string | undefined): UseProjectResult {
+  const [project, setProject] = useState<Case | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) {
+    if (!slug) {
       setProject(null);
       setLoading(false);
       return;
@@ -29,7 +29,7 @@ export function useProject(id: number | undefined): UseProjectResult {
       setLoading(true);
       setError(null);
 
-      const response = await apiClient.getProject(id);
+      const response = await apiClient.getProject(slug);
 
       if (!isMounted) return;
 
@@ -48,7 +48,7 @@ export function useProject(id: number | undefined): UseProjectResult {
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [slug]);
 
   return { project, loading, error };
 }
