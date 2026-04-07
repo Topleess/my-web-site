@@ -12,7 +12,7 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <React.Suspense fallback={null}>
+    <React.Suspense fallback={<div style={{background:'#000',width:'100vw',height:'100vh'}}/>}>
       <App />
       <Analytics />
     </React.Suspense>
