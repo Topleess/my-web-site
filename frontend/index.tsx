@@ -12,7 +12,9 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
-    <Analytics />
+    <React.Suspense fallback={null}>
+      <App />
+      <Analytics />
+    </React.Suspense>
   </React.StrictMode>
 );
