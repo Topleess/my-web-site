@@ -82,16 +82,16 @@ const Header: React.FC = () => {
             </Link>
 
             {/* Element 2 */}
+            <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:opacity-70 transition-opacity cursor-pointer">
+              {t('header.about')}
+            </a>
+
+            {/* Element 3 */}
             <a href="#projects" onClick={(e) => handleNavClick(e, 'projects')} className="hover:opacity-70 transition-opacity flex items-center gap-2 cursor-pointer">
               {t('header.projects')}
               <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${isScrolled ? 'bg-white text-black' : 'bg-white text-black'}`}>
                 {projectCount}
               </span>
-            </a>
-
-            {/* Element 3 */}
-            <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:opacity-70 transition-opacity cursor-pointer">
-              {t('header.about')}
             </a>
 
             {/* Element 4 */}
@@ -142,6 +142,13 @@ const Header: React.FC = () => {
       {isMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-black/95 backdrop-blur-md text-white p-6 md:hidden flex flex-col space-y-4 shadow-lg border-t border-white/10">
           <a
+            href="#about"
+            onClick={(e) => handleNavClick(e, 'about')}
+            className="text-lg font-medium hover:text-gray-300 transition-colors"
+          >
+            {t('header.about')}
+          </a>
+          <a
             href="#projects"
             onClick={(e) => handleNavClick(e, 'projects')}
             className="text-lg font-medium hover:text-gray-300 transition-colors flex items-center gap-2"
@@ -150,13 +157,6 @@ const Header: React.FC = () => {
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-black">
               {projectCount}
             </span>
-          </a>
-          <a
-            href="#about"
-            onClick={(e) => handleNavClick(e, 'about')}
-            className="text-lg font-medium hover:text-gray-300 transition-colors"
-          >
-            {t('header.about')}
           </a>
           <a
             href="#contact"

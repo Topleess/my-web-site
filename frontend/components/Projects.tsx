@@ -13,6 +13,13 @@ interface CategoryItem {
   count: number;
 }
 
+const CARD_CONFIGS = [
+  { w: 240, h: 158, rotate: -5, dx: 0,   dy: 0   },
+  { w: 170, h: 112, rotate:  7, dx: 210, dy: 36  },
+  { w: 136, h: 90,  rotate: -3, dx: 100, dy: -64 },
+  { w: 120, h: 80,  rotate: 10, dx: 248, dy: -22 },
+] as const;
+
 const Projects: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<Category>(i18n.language === 'en' ? 'All' : 'Все');
@@ -20,6 +27,16 @@ const Projects: React.FC = () => {
     category: activeCategory 
   });
   const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [hovered, setHovered] = useState<Case | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const getLocalizedCategory = (project: Case) => {
     if (i18n.language === 'en') return project.category_en;
@@ -53,34 +70,103 @@ const Projects: React.FC = () => {
     setActiveCategory(i18n.language === 'en' ? 'All' : 'Все');
   }, [i18n.language]);
 
-  const getCount = (cat: CategoryItem) => {
-    return cat.count || 0;
-  };
+  // Desktop preview: compute base position
+  const previewBelow = mousePos.y < 280;
+  const previewBaseX = Math.max(8, Math.min(
+    mousePos.x - 200,
+    (typeof window !== 'undefined' ? window.innerWidth : 1200) - 435
+  ));
+  const previewBaseY = previewBelow ? mousePos.y + 28 : mousePos.y - 186;
+  const pDur = hovered ? '180ms' : '100ms';
+  const pDelay = (i: number) => hovered ? `${i * 55}ms` : '0ms';
+
+  // Collect up to 4 unique image URLs for desktop hover cards
+  const hoveredImages: string[] = hovered
+    ? [
+        hovered.image,
+        ...(hovered.media?.filter(m => m.type === 'image' && !!m.url).map(m => m.url) ?? [])
+      ].filter(Boolean).slice(0, 4) as string[]
+    : [];
+
+  // Magazine layout: first 2 projects as featured cards only in "all" mode
+  const isShowingAll = activeCategory === 'Все' || activeCategory === 'All';
 
   return (
     <section id="projects" className="w-full bg-[#050505] text-white py-24 px-4 md:px-10 min-h-screen">
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .project-row {
+          animation: fadeSlideUp 0.4s ease forwards;
+          opacity: 0;
+          position: relative;
+        }
+      `}</style>
+
+      {/* === DESKTOP: scattered photo cards on hover === */}
+
+      {/* Label card — category tag */}
+      <div
+        className="hidden md:flex fixed pointer-events-none z-[9999] items-center justify-center shadow-lg"
+        style={{
+          width: 130, height: 38,
+          left: previewBaseX + 44,
+          top: previewBaseY - 46,
+          transform: 'rotate(2deg)',
+          background: '#0a0a0a',
+          border: '1px solid rgba(255,255,255,0.1)',
+          opacity: hovered ? 1 : 0,
+          transition: `opacity ${pDur} ease ${pDelay(0)}`,
+        }}
+      >
+        <span style={{ color: '#FF4533', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em' }}>
+          {hovered ? getLocalizedCategory(hovered) : ''}
+        </span>
+      </div>
+
+      {/* Image cards — up to 4, each with a unique real image from project.media */}
+      {CARD_CONFIGS.map((cfg, i) =>
+        hoveredImages[i] ? (
+          <div
+            key={i}
+            className="hidden md:block fixed pointer-events-none overflow-hidden shadow-2xl"
+            style={{
+              zIndex: 9998 - i,
+              width: cfg.w, height: cfg.h,
+              left: previewBaseX + cfg.dx,
+              top: previewBaseY + cfg.dy,
+              transform: `rotate(${cfg.rotate}deg)`,
+              opacity: hovered ? 1 : 0,
+              transition: `opacity ${pDur} ease ${pDelay(i + 1)}`,
+            }}
+          >
+            <img src={hoveredImages[i]} alt="" className="w-full h-full object-cover" />
+          </div>
+        ) : null
+      )}
+
       <div className="w-full mx-auto max-w-screen-2xl relative">
         
         {/* Sticky Section Label */}
         <div className="sticky top-20 z-30 mb-12 mix-blend-difference pointer-events-none self-start">
-             <span className="text-[#FF4533] font-bold text-sm tracking-widest uppercase inline-block">
-              // {t('projects.title')}
-            </span>
+          <span className="text-[#FF4533] font-bold text-sm tracking-widest uppercase inline-block">
+            // {t('projects.title')}
+          </span>
         </div>
 
         {/* Header Section: Title & Filters */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
           
           {/* Title */}
-          <div className="flex flex-col gap-4">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase">
-              {i18n.language === 'en' ? (
-                <>Featured<br/>Works</>
-              ) : (
-                <>Избранные<br/>Работы</>
-              )}
-            </h2>
-          </div>
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase">
+            {i18n.language === 'en' ? (
+              <>Featured<br/>Works</>
+            ) : (
+              <>Избранные<br/>Работы</>
+            )}
+          </h2>
 
           {/* Filters */}
           <div className="flex flex-wrap gap-3 md:gap-4">
@@ -102,7 +188,7 @@ const Projects: React.FC = () => {
               >
                 {cat.name}
                 <span className={`text-[10px] align-top opacity-60 ${activeCategory === cat.name ? 'text-black font-extrabold' : ''}`}>
-                  {getCount(cat)}
+                  {cat.count}
                 </span>
               </button>
             ))}
@@ -124,59 +210,135 @@ const Projects: React.FC = () => {
           </div>
         )}
 
-        {/* Projects Grid */}
-        {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-            {filteredProjects.map((project) => (
-            <Link 
-              to={`/project/${project.slug}`}
-              key={project.slug} 
-              className="group relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-gray-900 cursor-pointer block"
+        {/* Featured photo cards — desktop only, first 2 projects when showing all */}
+        {!loading && !error && isShowingAll && filteredProjects.length >= 2 && (
+          <div className="hidden md:grid grid-cols-5 gap-2 mb-2" style={{ height: 380 }}>
+
+            {/* Card 1 — larger, 3/5 width */}
+            <Link
+              to={`/project/${filteredProjects[0].slug}`}
+              className="col-span-3 relative overflow-hidden group"
+              onMouseEnter={() => setHovered(filteredProjects[0])}
+              onMouseLeave={() => setHovered(null)}
             >
-              {/* Image */}
-              <img 
-                src={project.image} 
-                alt={project.title} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-60"
+              <img
+                src={filteredProjects[0].image} alt=""
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10" />
+              <span
+                className="absolute top-4 left-5 text-white font-bold font-mono select-none pointer-events-none"
+                style={{ fontSize: 128, lineHeight: 1, opacity: 0.06 }}
+              >01</span>
+              <div className="absolute bottom-6 left-6 right-14">
+                <span className="block text-[#FF4533] text-[9px] font-bold uppercase tracking-[0.25em] mb-2">
+                  {getLocalizedCategory(filteredProjects[0])}
+                </span>
+                <h3 className="text-2xl font-bold uppercase tracking-tight text-white leading-tight mb-1 truncate">
+                  {filteredProjects[0].title}
+                </h3>
+                <span className="text-gray-400 text-xs font-mono">{getLocalizedNiche(filteredProjects[0])}</span>
+              </div>
+              <ArrowUpRight size={18} className="absolute bottom-6 right-6 text-white opacity-0 group-hover:opacity-100 transition-all duration-300" />
+            </Link>
 
-              {/* Dark Gradient Overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-90 transition-opacity duration-300" />
+            {/* Card 2 — smaller, 2/5 width */}
+            <Link
+              to={`/project/${filteredProjects[1].slug}`}
+              className="col-span-2 relative overflow-hidden group"
+              onMouseEnter={() => setHovered(filteredProjects[1])}
+              onMouseLeave={() => setHovered(null)}
+            >
+              <img
+                src={filteredProjects[1].image} alt=""
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10" />
+              <span
+                className="absolute top-4 left-5 text-white font-bold font-mono select-none pointer-events-none"
+                style={{ fontSize: 128, lineHeight: 1, opacity: 0.06 }}
+              >02</span>
+              <div className="absolute bottom-6 left-6 right-14">
+                <span className="block text-[#FF4533] text-[9px] font-bold uppercase tracking-[0.25em] mb-2">
+                  {getLocalizedCategory(filteredProjects[1])}
+                </span>
+                <h3 className="text-xl font-bold uppercase tracking-tight text-white leading-tight mb-1 truncate">
+                  {filteredProjects[1].title}
+                </h3>
+                <span className="text-gray-400 text-xs font-mono">{getLocalizedNiche(filteredProjects[1])}</span>
+              </div>
+              <ArrowUpRight size={18} className="absolute bottom-6 right-6 text-white opacity-0 group-hover:opacity-100 transition-all duration-300" />
+            </Link>
 
-              {/* Content Overlay */}
-              <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between">
-                
-                {/* Top: Category & Arrow */}
-                <div className="flex justify-between items-start w-full transform -translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                  <span className="text-[#FF4533] text-xs font-bold tracking-widest uppercase border border-[#FF4533] px-2 py-1 rounded-sm">
+          </div>
+        )}
+
+        {/* Editorial list — remaining projects (or all when filtering) */}
+        {!loading && !error && (
+          <div key={activeCategory} className="border-t border-white/10">
+            {(isShowingAll ? filteredProjects.slice(2) : filteredProjects).map((project, idx) => {
+              const listIndex = isShowingAll ? idx + 2 : idx;
+              return (
+                <Link
+                  key={project.slug}
+                  to={`/project/${project.slug}`}
+                  className="project-row group relative isolate overflow-hidden flex items-center gap-4 md:gap-6 py-7 md:py-5 border-b border-white/10 hover:border-white/25 hover:bg-white/[0.02] transition-all duration-300 px-1"
+                  style={{ animationDelay: `${listIndex * 38}ms` }}
+                  onMouseEnter={() => setHovered(project)}
+                  onMouseLeave={() => setHovered(null)}
+                >
+                  {/* Mobile: cinematic background image with dark overlay */}
+                  <span
+                    className="md:hidden absolute inset-0 pointer-events-none"
+                    style={{
+                      backgroundImage: `linear-gradient(rgba(5,5,5,0.70), rgba(5,5,5,0.70)), url(${project.image})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      zIndex: -1,
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  {/* Index */}
+                  <span className="text-gray-700 text-xs font-mono w-8 shrink-0 group-hover:text-gray-500 transition-colors">
+                    {String(listIndex + 1).padStart(2, '0')}
+                  </span>
+
+                  {/* Title + mobile category */}
+                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                    <h3 className="text-base md:text-xl lg:text-2xl font-bold uppercase tracking-tight group-hover:text-white transition-colors duration-300 truncate">
+                      {project.title}
+                    </h3>
+                    <span className="md:hidden text-[#FF4533] text-[9px] font-bold uppercase tracking-widest">
+                      {getLocalizedCategory(project)}
+                    </span>
+                  </div>
+
+                  {/* Niche */}
+                  <span className="hidden md:block text-gray-500 text-sm font-mono shrink-0 max-w-[180px] truncate">
+                    {getLocalizedNiche(project)}
+                  </span>
+
+                  {/* Period */}
+                  {getLocalizedPeriod(project) && (
+                    <span className="hidden lg:block text-gray-600 text-xs font-mono shrink-0">
+                      {getLocalizedPeriod(project)}
+                    </span>
+                  )}
+
+                  {/* Category */}
+                  <span className="hidden md:block text-[#FF4533] text-xs font-bold uppercase tracking-widest shrink-0 min-w-[72px] text-right">
                     {getLocalizedCategory(project)}
                   </span>
-                  <div className="bg-white text-black p-2 rounded-full">
-                    <ArrowUpRight size={20} />
-                  </div>
-                </div>
 
-                {/* Bottom: Title & Meta */}
-                <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                  <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tight mb-2 text-white">
-                    {project.title}
-                  </h3>
-                  <div className="flex items-center gap-4 text-sm md:text-base text-gray-300 font-medium font-mono">
-                    <span className="text-[#FF4533]">
-                       ● {getLocalizedNiche(project)}
-                    </span>
-                    {getLocalizedPeriod(project) && (
-                      <>
-                        <span className="text-gray-500">/</span>
-                        <span>{getLocalizedPeriod(project)}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-            </Link>
-            ))}
+                  {/* Arrow */}
+                  <ArrowUpRight
+                    size={18}
+                    className="shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0 text-white"
+                  />
+                </Link>
+              );
+            })}
           </div>
         )}
         
