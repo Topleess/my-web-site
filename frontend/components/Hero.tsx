@@ -11,7 +11,7 @@ const Hero: React.FC = () => {
       {/* Increased brightness and contrast so the background is light enough to turn difference-text black */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://i.ibb.co/tpSw6kW8/Frame-20.png"
+          src="https://oyqaiycfiqalqhfjmfvq.supabase.co/storage/v1/object/public/assets/hero.png"
           alt="Background Portrait"
           className="w-full h-full object-cover grayscale brightness-110 contrast-150"
         />
