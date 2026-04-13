@@ -36,6 +36,11 @@ const Projects: React.FC = () => {
     return project.period_ru || '';
   };
 
+  const getLocalizedTitle = (project: Case) => {
+    if (i18n.language === 'en') return project.title_en || project.title;
+    return project.title_ru || project.title;
+  };
+
   // Загрузка категорий с учетом языка
   useEffect(() => {
     const fetchCategories = async () => {
@@ -165,7 +170,7 @@ const Projects: React.FC = () => {
                     {getLocalizedCategory(project)}
                   </span>
                   <h3 className="text-sm md:text-base font-bold uppercase tracking-tight text-white leading-tight truncate mb-1">
-                    {project.title}
+                    {getLocalizedTitle(project)}
                   </h3>
                   <span className="text-gray-500 text-xs font-mono truncate block">
                     {getLocalizedNiche(project)}{getLocalizedPeriod(project) ? ` · ${getLocalizedPeriod(project)}` : ''}

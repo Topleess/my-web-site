@@ -91,7 +91,7 @@ const ProjectPage: React.FC = () => {
         {/* Title + Period */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/20 pb-8 mb-6">
           <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-none">
-            {project.title}
+            {loc(project.title_ru || project.title, project.title_en || project.title)}
           </h1>
           {(project.period_ru || project.period_en) && (
             <span className="text-[#FF4533] font-mono text-base md:text-lg shrink-0">

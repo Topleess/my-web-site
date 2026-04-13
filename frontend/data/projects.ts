@@ -21,6 +21,8 @@ export interface Case {
   id: string;
   slug: string;
   title: string;
+  title_en?: string | null;
+  title_ru?: string | null;
   category_en: string;
   category_ru: string;
   image: string;
